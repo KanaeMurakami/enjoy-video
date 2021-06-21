@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 class Video < ApplicationRecord
-  PAYMENT = %w[無料 見放題 有料].freeze
+  has_one :video_payment, dependent: :destroy
+  has_one :payment, through: :video_payment
+  has_many :video_genres, dependent: :destroy
+  has_many :genres, through: :video_genres
 
   validates :title, presence: true
   # payment には「無料/見放題/有料」のいずれかが入っていることを確かめるバリデーションを追加
