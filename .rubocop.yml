@@ -1,0 +1,19 @@
+require: rubocop-rails
+AllCops:
+  NewCops: enable
+  Exclude:
+    - "bin/**/*"
+    - "config/**/*"
+    - "db/**/*"
+    - "script/**/*"
+    - "vendor/**/*"
+    - "Rakefile"
+    - "config.ru"
+    - "Gemfile"
+  TargetRubyVersion: 3.0
+
+Style/AsciiComments:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
