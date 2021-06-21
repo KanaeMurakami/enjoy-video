@@ -1,24 +1,22 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+DB の構成を楽しく考えるためのプロジェクトです。
 
-Things you may want to cover:
+## Ruby
 
-* Ruby version
+- ruby 3.0.1
 
-* System dependencies
+## 環境構築
 
-* Configuration
+### clone
 
-* Database creation
+```
+git clone git@github.com:KanaeMurakami/enjoy-video.git
+```
 
-* Database initialization
+### bundle install
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```
+cd enjoy-video
+bundle install
+```
