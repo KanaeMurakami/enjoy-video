@@ -8,12 +8,16 @@ class Video < ApplicationRecord
 
   # genre: "映画" のビデオを絞り込むスコープを追加
   scope :movies, lambda {
+    where('property LIKE ?', '%映画%')
   }
 
   private
 
   # payment には「無料/見放題/有料」のいずれかが入っていることを確かめるバリデーションを追加
   def validation_payment
-    # errors.add(:property, :inclusion)
+    genre = JSON.parse(property)['genre']
+    return if genre.in?(PAYMENT)
+
+    errors.add(:property, :inclusion)
   end
 end
