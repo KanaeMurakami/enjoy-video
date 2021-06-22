@@ -7,5 +7,5 @@ class Payment < ApplicationRecord
   has_one :video, through: :video_payment
 
   # name には「無料/見放題/有料」のいずれかが入っていることを確かめるバリデーションを追加
-  # validates :name, ...
+  validates :name, inclusion: { in: NAMES }
 end
