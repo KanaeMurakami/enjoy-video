@@ -7,12 +7,11 @@ on:
 jobs:
   automate-project-columns:
     runs-on: ubuntu-latest
-    if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
       - uses: peter-evans/create-or-update-project-card@v1
         with:
           project-location: KanaeMurakami
-          project-name: test
+          project-name: てすと
           column-name: To do
           issue-number: ${{ github.event.number }}
           token: ${{ secrets.GHPROJECT_TOKEN }}
