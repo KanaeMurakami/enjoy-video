@@ -16,7 +16,7 @@ jobs:
       - name: echo_zero
         run: |
           path="./test.yml"
-          test1="ああ${{ github.event.inputs.count }}あ"
+          test1=./ああ${{ github.event.inputs.count }}あ.txt
           count=`ls $path | wc -l`
           if [ ${{ github.event.inputs.count }} -ne 0 ]; then
             echo $count
