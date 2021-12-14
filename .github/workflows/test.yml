@@ -1,19 +1,20 @@
 name: test
+
 on:
   schedule:
     - cron: '00 03 * * 2'
   workflow_dispatch:
     inputs:
       count:
-      description: '数値を入力してください'
-      required: true
-      default: '0'
+        description: '数値を入力してください'
+        required: true
+        default: '0'
 jobs:
   stale:
-  runs-on: ubuntu-latest
-  steps:
-    - name: echo_zero
-      run: |
-        if ${{ github.event.inputs.count }} -ne 0 ; then
-          echo "0です"
-        fi
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo_zero
+        run: |
+          if ${{ github.event.inputs.count }} -ne 0 ; then
+            echo "0です"
+          fi
