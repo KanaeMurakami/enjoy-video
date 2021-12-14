@@ -15,4 +15,6 @@ jobs:
     steps:
       - name: echo_zero
         run: |
-          test ${{ github.event.inputs.count }} -ne 0 ; echo $?
+          if [ ${{ github.event.inputs.count }} -nq 0 ]; then
+            echo not_zero
+          fi
