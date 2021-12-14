@@ -15,6 +15,4 @@ jobs:
     steps:
       - name: echo_zero
         run: |
-          if ${{ github.event.inputs.count }} -ne 0 ; then
-            echo "0です"
-          fi
+          test ${{ github.event.inputs.count }} -ne 0 ; echo "0です"
