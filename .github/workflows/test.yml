@@ -16,7 +16,7 @@ jobs:
       - name: echo_zero
         run: |
           path = "./test.yml"
-          count = ls $path | wc -l
+          count = `ls $path | wc -l`
           if [ ${{ github.event.inputs.count }} -ne 0 ]; then
             echo $count
           fi
