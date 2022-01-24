@@ -17,7 +17,7 @@ jobs:
         run: |
           path="./test.yml"
           test1=./ああ${{ github.event.inputs.count }}あ.txt"
-          year=${{ github.event.inputs.count:2:2 }}
+          year=${${{ github.event.inputs.count }}:2:2}
           count=`ls $path | wc -l`
           if [ ${{ github.event.inputs.count }} -ne 0 ]; then
             echo $count
