@@ -7,5 +7,4 @@ updates:
     groups:
       hoge:
         patterns:
-          - 'pry-rails'
-          - 'rubocop-rails'
+          - 'action*'
