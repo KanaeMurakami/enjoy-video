@@ -4,3 +4,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      hoge:
+        patterns:
+          - 'pry-rails'
+          - 'rubocop-rails'
