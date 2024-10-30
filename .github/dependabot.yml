@@ -8,3 +8,6 @@ updates:
       hoge:
         patterns:
           - 'action*'
+      active:
+        patterns:
+          - 'active*'
