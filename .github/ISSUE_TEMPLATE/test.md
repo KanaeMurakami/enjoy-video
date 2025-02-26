@@ -1,7 +1,7 @@
 ---
 name: テストタスク
 about: テストです
-projects: "KanaeMurakami/2"
+projects: "KanaeMurakami/3"
 ---
 
 # About
