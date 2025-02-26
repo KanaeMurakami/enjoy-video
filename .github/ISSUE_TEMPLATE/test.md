@@ -1,7 +1,7 @@
 ---
 name: テストタスク
 about: テストです
-projects: 'KanaeMurakami/projects/2'
+projects: ['KanaeMurakami/2']
 ---
 
 # About
