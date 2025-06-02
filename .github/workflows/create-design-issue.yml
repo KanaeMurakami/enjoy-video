@@ -18,6 +18,41 @@ jobs:
         script: |
           const issueNumber = context.issue.number;
 
+          // 元のIssueの情報を取得
+          const originalIssue = await github.rest.issues.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: issueNumber
+          });
+
+          // 既存のデザインIssueをチェック
+          const existingIssues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            labels: 'design',
+            state: 'all'
+          });
+
+          // 既に対応するデザインIssueが存在するかチェック
+          const expectedTitle = 'D_' + originalIssue.data.title;
+          const existingDesignIssue = existingIssues.data.find(issue =>
+            issue.title === expectedTitle
+          );
+
+          if (existingDesignIssue) {
+            console.log('Design issue already exists: #' + existingDesignIssue.number + ' for issue #' + issueNumber);
+
+            // 既存のデザインIssueへのリンクをコメント
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: '- デザインIssue: #' + existingDesignIssue.number + ' (既存)'
+            });
+
+            return;
+          }
+
           // デザインIssueの内容を作成
           const issueBody = '# 概要\n\n<!-- 何かあれば追記。 -->\n\n- 下記開発Issueの通り\n\n# 開発Issue\n\n<!-- 開発IssueのURLを貼る。 -->\n\n- #' + issueNumber + '\n\n# 関連URL\n\n<!-- 関連するURLを箇条書きで記載する。 -->\n\n# 成果物\n\n<!-- FigmaなどのURLを貼る。 -->';
 
@@ -25,7 +60,7 @@ jobs:
           const newIssue = await github.rest.issues.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            title: 'D_',
+            title: 'D_' + originalIssue.data.title,
             body: issueBody,
             labels: ['design']
           });
