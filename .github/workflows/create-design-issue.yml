@@ -1,3 +1,4 @@
+# need_designラベルが追加された場合にデザインIssueを自動作成する
 name: Create Design Issue
 
 on:
@@ -38,39 +39,47 @@ jobs:
           const existingDesignIssue = existingIssues.data.find(issue =>
             issue.title === expectedTitle
           );
+          let designIssueNumber;
 
-          if (existingDesignIssue) {
+          if (!existingDesignIssue) {
+            // デザインIssueの内容を作成
+            const issueBody = '# 概要\n\n<!-- 何かあれば追記。 -->\n\n- 下記開発Issueの通り\n\n# 開発Issue\n\n<!-- 開発IssueのURLを貼る。 -->\n\n- #' + issueNumber + '\n\n# 関連URL\n\n<!-- 関連するURLを箇条書きで記載する。 -->\n\n# 成果物\n\n<!-- FigmaなどのURLを貼る。 -->';
+
+            // デザインIssueを作成
+            const newIssue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'D_' + originalIssue.data.title,
+              body: issueBody,
+              labels: ['design']
+            });
+            designIssueNumber = newIssue.data.number;
+
+            console.log('Created design issue #' + newIssue.data.number + ' for issue #' + issueNumber);
+          } else {
+            designIssueNumber = existingDesignIssue.number;
             console.log('Design issue already exists: #' + existingDesignIssue.number + ' for issue #' + issueNumber);
+          }
 
-            // 既存のデザインIssueへのリンクをコメント
-            await github.rest.issues.createComment({
+          // 元のIssueの ${デザインIssue番号} プレースホルダーを実際の番号に置換
+          let updatedBody = originalIssue.data.body || '';
+
+          // ${デザインIssue番号} プレースホルダーを実際の番号に置換
+          if (updatedBody.includes('${デザインIssue番号}')) {
+            updatedBody = updatedBody.replace('${デザインIssue番号}', '#' + designIssueNumber);
+
+            await github.rest.issues.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber,
-              body: '- デザインIssue: #' + existingDesignIssue.number + ' (既存)'
+              body: updatedBody
             });
-
-            return;
           }
 
-          // デザインIssueの内容を作成
-          const issueBody = '# 概要\n\n<!-- 何かあれば追記。 -->\n\n- 下記開発Issueの通り\n\n# 開発Issue\n\n<!-- 開発IssueのURLを貼る。 -->\n\n- #' + issueNumber + '\n\n# 関連URL\n\n<!-- 関連するURLを箇条書きで記載する。 -->\n\n# 成果物\n\n<!-- FigmaなどのURLを貼る。 -->';
-
-          // デザインIssueを作成
-          const newIssue = await github.rest.issues.create({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            title: 'D_' + originalIssue.data.title,
-            body: issueBody,
-            labels: ['design']
-          });
-
-          // 元のIssueにコメントを追加
+          // 元のIssueにコメントも追加
           await github.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: issueNumber,
-            body: '- デザインIssue: #' + newIssue.data.number
+            body: 'デザインIssue: #' + designIssueNumber
           });
-
-          console.log('Created design issue #' + newIssue.data.number + ' for issue #' + issueNumber);
