@@ -1,0 +1,41 @@
+name: Create Design Issue
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  create-design-issue:
+    # need_designラベルが追加された場合のみ実行
+    if: github.event.label.name == 'need_design'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Create Design Issue
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const issueNumber = context.issue.number;
+
+          // デザインIssueの内容を作成
+          const issueBody = '# 概要\n\n<!-- 何かあれば追記。 -->\n\n- 下記開発Issueの通り\n\n# 開発Issue\n\n<!-- 開発IssueのURLを貼る。 -->\n\n- #' + issueNumber + '\n\n# 関連URL\n\n<!-- 関連するURLを箇条書きで記載する。 -->\n\n# 成果物\n\n<!-- FigmaなどのURLを貼る。 -->';
+
+          // デザインIssueを作成
+          const newIssue = await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: 'D_',
+            body: issueBody,
+            labels: ['design']
+          });
+
+          // 元のIssueにコメントを追加
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: issueNumber,
+            body: '- デザインIssue: #' + newIssue.data.number
+          });
+
+          console.log('Created design issue #' + newIssue.data.number + ' for issue #' + issueNumber);
