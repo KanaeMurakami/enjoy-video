@@ -45,7 +45,10 @@ jobs:
           );
           let designIssueNumber;
 
-          if (!existingDesignIssue) {
+          if (existingDesignIssue) {
+            designIssueNumber = existingDesignIssue.number;
+            console.log('Design issue already exists: #' + designIssueNumber + ' for issue #' + issueNumber);
+          } else {
             // デザインIssueの内容を作成
             const issueBody = '# 概要\n\n<!-- 何かあれば追記。 -->\n\n- 下記開発Issueの通り\n\n# 開発Issue\n\n<!-- 開発IssueのURLを貼る。 -->\n\n- #' + issueNumber + '\n\n# 関連URL\n\n<!-- 関連するURLを箇条書きで記載する。 -->\n\n# 成果物\n\n<!-- FigmaなどのURLを貼る。 -->';
 
@@ -59,10 +62,7 @@ jobs:
             });
             designIssueNumber = newIssue.data.number;
 
-            console.log('Created design issue #' + newIssue.data.number + ' for issue #' + issueNumber);
-          } else {
-            designIssueNumber = existingDesignIssue.number;
-            console.log('Design issue already exists: #' + existingDesignIssue.number + ' for issue #' + issueNumber);
+            console.log('Created design issue #' + designIssueNumber + ' for issue #' + issueNumber);
           }
 
           // 元のIssueの ${デザインIssue番号} プレースホルダーを実際の番号に置換
@@ -85,5 +85,5 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: issueNumber,
-            body: 'デザインIssue: #' + designIssueNumber
+            body: '- デザインIssue: #' + designIssueNumber
           });
