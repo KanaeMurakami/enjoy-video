@@ -50,7 +50,7 @@ jobs:
             console.log('Design issue already exists: #' + designIssueNumber + ' for issue #' + issueNumber);
           } else {
             // デザインIssueの内容を作成
-            const issueBody = '# 概要\n\n<!-- 何かあれば追記。 -->\n\n- 下記開発Issueの通り\n\n# 開発Issue\n\n<!-- 開発IssueのURLを貼る。 -->\n\n- #' + issueNumber + '\n\n# 関連URL\n\n<!-- 関連するURLを箇条書きで記載する。 -->\n\n# 成果物\n\n<!-- FigmaなどのURLを貼る。 -->';
+            const issueBody = '# 概要\n\n<!-- 何をデザインするのか、簡潔に記載してください -->\n\n## 開発Issue\n\n- 元Issue: #' + issueNumber + '\n- 作成者: @' + originalIssue.data.user.login + '\n\n# 関連URL\n\n<!-- 関連するデザインガイドライン、参考サイト、既存のコンポーネントなどを記載 -->\n\n# 成果物\n\n<!-- Figmaファイルや画像ファイルのURLを記載 -->\n\n- [ ] Figma URL:';
 
             // デザインIssueを作成
             const newIssue = await github.rest.issues.create({
