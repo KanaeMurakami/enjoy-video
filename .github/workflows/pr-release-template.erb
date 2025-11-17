@@ -1,0 +1,21 @@
+リリース <%= Date.today %>
+<% ignored_logins = %w[copilot github-copilot] -%>
+<% pull_requests.each do |pr| -%>
+  <% assignee_logins = Array(pr.assignees).map { |assignee| assignee.respond_to?(:login) ? assignee.login : nil }.compact %>
+  <% preferred_login = assignee_logins.find { |login| !ignored_logins.include?(login.to_s.downcase) } %>
+  <% checklist_item =
+    if preferred_login
+      base = pr.to_checklist_item
+      if base.match?(/@[A-Za-z0-9-]+/)
+        base.sub(/@[A-Za-z0-9-]+/, "@#{preferred_login}")
+      else
+        "#{base} @#{preferred_login}"
+      end
+    else
+      ignored_logins.reduce(pr.to_checklist_item) do |text, login|
+        text.gsub(/(\s|^)@#{Regexp.escape(login)}\b/i, '')
+      end
+    end
+  -%>
+  <%= checklist_item %>
+<% end -%>
