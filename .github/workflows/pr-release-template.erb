@@ -2,18 +2,36 @@
 <% ignored_logins = %w[copilot github-copilot] -%>
 <% pull_requests.each do |pr| -%>
 <%
-  base = pr.to_checklist_item
-  base_without_mention = base.gsub(/\s*@[-A-Za-z0-9]+\b/i, '').strip
+  base_line = pr.to_checklist_item.strip
+  current_mention = base_line[/@[A-Za-z0-9-]+\b/]
+  current_login = current_mention ? current_mention.delete_prefix('@').downcase : nil
 
+  # 優先順: 複数アサイン > メインアサイン > 作者
   candidate_logins = []
-  candidate_logins.concat(Array(pr.assignees).filter_map { |assignee| assignee.respond_to?(:login) ? assignee.login : nil }) if pr.respond_to?(:assignees)
+  if pr.respond_to?(:assignees)
+    candidate_logins.concat(Array(pr.assignees).filter_map { |assignee| assignee.respond_to?(:login) ? assignee.login : nil })
+  end
   candidate_logins << (pr.assignee&.login if pr.respond_to?(:assignee))
   candidate_logins << (pr.user&.login if pr.respond_to?(:user))
 
-  mention_login = candidate_logins.compact.uniq.find do |login|
-    !ignored_logins.include?(login.downcase)
+  target_login = candidate_logins.compact.uniq.find do |login|
+    login && !ignored_logins.include?(login.downcase)
   end
 
-  checklist_line = mention_login ? "#{base_without_mention} @#{mention_login}" : base_without_mention
--%><%= checklist_line %>
+  sanitized_line = if target_login
+    if current_login == target_login.downcase
+      base_line
+    elsif current_mention
+      base_line.sub(/@[A-Za-z0-9-]+\b/, "@#{target_login}")
+    else
+      "#{base_line} @#{target_login}"
+    end
+  else
+    if current_login && ignored_logins.include?(current_login)
+      base_line.sub(/\s*@#{Regexp.escape(current_mention.delete_prefix('@'))}\b/i, '').strip
+    else
+      base_line
+    end
+  end
+-%><%= sanitized_line %>
 <% end -%>
