@@ -1,35 +1,4 @@
 リリース <%= Date.today %>
-<% ignored_logins = %w[copilot] # Copilotアカウントへの誤通知を防ぐための除外リストです! -%>
 <% pull_requests.each do |pr| -%>
-<%
-  # git-pr-release が生成した行（チェック状態やPR番号を含む）を取得
-  existing_line = pr.to_checklist_item.strip
-  mention_match = existing_line.match(/@[A-Za-z0-9-]+\b/)
-  current_login = mention_match&.to_s&.delete_prefix('@')
-  current_login_normalized = current_login&.downcase
-
-  # メンション候補を優先度順に収集: 複数アサイン > メインアサイン > 作者
-  candidate_logins = []
-  if pr.respond_to?(:assignees)
-    candidate_logins.concat(
-      Array(pr.assignees).filter_map { |assignee| assignee.respond_to?(:login) ? assignee.login : nil }
-    )
-  end
-  candidate_logins << (pr.assignee&.login if pr.respond_to?(:assignee))
-  candidate_logins << (pr.user&.login if pr.respond_to?(:user))
-
-  # 除外対象でない最初の候補を採用
-  target_login = candidate_logins.compact.uniq.find do |login|
-    login && !ignored_logins.include?(login.downcase)
-  end
-
-  sanitized_line =
-    if target_login && mention_match && current_login_normalized != target_login.downcase
-      # Copilot以外の候補が見つかり、既存メンションが別ユーザーの場合のみ差し替え
-      existing_line.sub(/@[A-Za-z0-9-]+\b/, "@#{target_login}")
-    else
-      # それ以外（既に目的ユーザーがメンション済み、メンション不要、代替不可）はそのまま利用
-      existing_line
-    end
--%><%= sanitized_line %>
+  <%=  pr.to_checklist_item %>
 <% end -%>
