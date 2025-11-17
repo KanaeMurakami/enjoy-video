@@ -3,19 +3,17 @@
 <% pull_requests.each do |pr| -%>
 <%
   base = pr.to_checklist_item
-  assignee_logins = Array(pr.assignees).filter_map { |assignee| assignee.respond_to?(:login) ? assignee.login : nil }
-  preferred_login = assignee_logins.find { |login| !ignored_logins.include?(login.to_s.downcase) }
-  checklist_item = if preferred_login
-    if base.match?(/@[A-Za-z0-9-]+/)
-      base.sub(/@[A-Za-z0-9-]+/, "@#{preferred_login}")
-    else
-      "#{base} @#{preferred_login}"
-    end
-  else
-    ignored_logins.reduce(base) do |text, login|
-      text.gsub(/(\s|^)@#{Regexp.escape(login)}\b/i, '')
-    end
+  base_without_mention = base.gsub(/\s*@[-A-Za-z0-9]+\b/i, '').strip
+
+  candidate_logins = []
+  candidate_logins.concat(Array(pr.assignees).filter_map { |assignee| assignee.respond_to?(:login) ? assignee.login : nil }) if pr.respond_to?(:assignees)
+  candidate_logins << (pr.assignee&.login if pr.respond_to?(:assignee))
+  candidate_logins << (pr.user&.login if pr.respond_to?(:user))
+
+  mention_login = candidate_logins.compact.uniq.find do |login|
+    !ignored_logins.include?(login.downcase)
   end
--%>
-<%= checklist_item.lstrip %>
+
+  checklist_line = mention_login ? "#{base_without_mention} @#{mention_login}" : base_without_mention
+-%><%= checklist_line %>
 <% end -%>
