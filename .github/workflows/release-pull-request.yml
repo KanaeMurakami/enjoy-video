@@ -1,0 +1,27 @@
+name: Create Release Pull Request
+permissions: {}
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "development"
+jobs:
+  create-release-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # checkout
+      pull-requests: write # git-pr-release-action
+    steps:
+      - name: checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+          ref: development
+      - name: git-pr-release
+        uses: bakunyo/git-pr-release-action@035b7151a53745c03b85c6274ab1ae4bc734eccd # v1.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_PR_RELEASE_TEMPLATE: './.github/workflows/pr-release-template.erb'
+          GIT_PR_RELEASE_LABELS: release
+          GIT_PR_RELEASE_BRANCH_PRODUCTION: main
+          GIT_PR_RELEASE_BRANCH_STAGING: development
