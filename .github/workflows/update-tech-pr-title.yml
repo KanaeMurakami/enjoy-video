@@ -2,7 +2,7 @@ name: Update Tech PR Title
 
 on:
   pull_request:
-    types: [opened, edited, labeled]
+    types: [review_requested]
 
 jobs:
   update-title:
