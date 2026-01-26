@@ -5,7 +5,7 @@
   # git-pr-release が生成した行（チェック状態やPR番号を含む）を取得
   existing_line = pr.to_checklist_item.strip
   mention_match = existing_line.match(/@[A-Za-z0-9-]+\b/)
-  current_login = mention_match&.to_s&.delete_prefix('@')
+  current_login = mention_match ? mention_match[0].delete_prefix('@') : nil
   current_login_normalized = current_login&.downcase
 
   # メンション候補を優先度順に収集: 複数アサイン > メインアサイン > 作者
@@ -26,6 +26,7 @@
   sanitized_line =
     if target_login && mention_match && current_login_normalized != target_login.downcase
       # Copilot以外の候補が見つかり、既存メンションが別ユーザーの場合のみ差し替え
+      # （既に適切なユーザー（Copilot以外）がメンション済みの場合は差し替えない）
       existing_line.sub(/@[A-Za-z0-9-]+\b/, "@#{target_login}")
     else
       # それ以外（既に目的ユーザーがメンション済み、メンション不要、代替不可）はそのまま利用
